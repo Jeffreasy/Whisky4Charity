@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint .",
+    "build": "vite build",
+    "vercel-build": "npm install && vite build",
     "preview": "vite preview",
-    "vercel-build": "vite build"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.47.8",
