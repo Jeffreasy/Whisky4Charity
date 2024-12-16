@@ -6,7 +6,7 @@ const images = [
   {
     id: 'art',
     src: 'https://cdn.prod.website-files.com/65c565c4d3b23f3e1de26055/673effe1014d200884a17816_2-minTEST.webp',
-    text: 'ART',
+    text: 'Art',
     path: '/art'
   },
   {
@@ -21,7 +21,7 @@ const images = [
     text: 'CHARITY',
     path: '/charity'
   }
-]
+] as const
 
 const RotatingGallery = () => {
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -36,7 +36,7 @@ const RotatingGallery = () => {
     const now = Date.now()
     const timeSince = now - lastTap.current
     if (timeSince < 300 && timeSince > 0) {
-      navigate(images[currentIndex].path)
+      navigate(images[currentIndex]?.path ?? '/')
     }
     lastTap.current = now
   }
@@ -48,7 +48,12 @@ const RotatingGallery = () => {
     let iterations = 0
 
     const interval = setInterval(() => {
-      textRef.current!.innerHTML = text
+      if (!textRef.current) {
+        clearInterval(interval)
+        return
+      }
+
+      textRef.current.innerHTML = text
         .split("")
         .map((letter, index) => {
           if (index < iterations) {
@@ -66,6 +71,8 @@ const RotatingGallery = () => {
 
       iterations += 1 / 3
     }, 30)
+
+    return () => clearInterval(interval)
   }
 
   useEffect(() => {
@@ -78,17 +85,23 @@ const RotatingGallery = () => {
   }, [isHovered])
 
   useEffect(() => {
-    scrambleText(images[currentIndex].text)
+    const currentImage = images[currentIndex]
+    if (currentImage) {
+      scrambleText(currentImage.text)
+    }
   }, [currentIndex, isTextHovered])
+
+  const currentImage = images[currentIndex]
+  if (!currentImage) return null
 
   return (
     <div className="flex flex-col items-center gap-8">
       <motion.div
-        className="relative w-[500px] h-[500px] rounded-full overflow-hidden cursor-pointer"
+        className="relative w-[100px] h-[100px] rounded-full overflow-hidden cursor-pointer"
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
         onClick={handleTap}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.1 }}
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -108,8 +121,8 @@ const RotatingGallery = () => {
               }}
             />
             <img
-              src={images[currentIndex].src}
-              alt={images[currentIndex].text}
+              src={currentImage.src}
+              alt={currentImage.text}
               className="w-full h-full object-cover"
             />
           </motion.div>
@@ -121,7 +134,7 @@ const RotatingGallery = () => {
         className="text-white text-6xl font-thin tracking-[0.2em] cursor-pointer select-none"
         onHoverStart={() => setIsTextHovered(true)}
         onHoverEnd={() => setIsTextHovered(false)}
-        onClick={() => navigate(images[currentIndex].path)}
+        onClick={() => navigate(currentImage.path)}
         whileHover={{ scale: 1.1 }}
       />
     </div>

@@ -7,7 +7,6 @@ import Art from './pages/Art'
 import Whisky from './pages/Whisky'
 import Charity from './pages/Charity'
 import About from './pages/About'
-import LanguageCarousel from './components/LanguageCarousel'
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
